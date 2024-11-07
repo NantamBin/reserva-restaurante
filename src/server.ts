@@ -1,8 +1,9 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import authRoutes from './auth';
-import userRoutes from './user';
+import userRoutes from './routes/user';
+import restaurantRoutes from './routes/reservation';
+import reservationRoutes from './routes/restaurant';
 
 dotenv.config();
 const app = express();
@@ -14,8 +15,9 @@ mongoose.connect(process.env.MONGO_URI as string).then(() => {
     console.error('Erro ao conectar ao MongoDB:', error);
 });
 // Rotas
-app.use('/auth', authRoutes);
-app.use('/user', userRoutes);
+app.use('/', userRoutes);
+app.use('/', reservationRoutes);
+app.use('/', restaurantRoutes);
 // Iniciar o servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

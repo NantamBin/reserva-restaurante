@@ -1,44 +1,55 @@
-import mongoose from 'mongoose';
-const Comment = require('../models/commentModel');
-const Post = require('../models/commentModel');
-const User = require('../models/commentModel');
+import Restaurant, { IRestaurant } from "../models/restaurantModel";
 
 export default {
-    // Método para obter um comentário por ID
-    async getAllRestaurant() {
-            const comment = await Comment.findById(id).populate('autor postagem'); // Popula os dados do autor e da postagem
-            if (comment) {
-                return comment;
-            } else {
-                throw new Error("Erro");
-            }
+    // Método para obter todos os restaurante
+    async getAllRestaurant(): Promise<IRestaurant[]> {
+        return await Restaurant.find();
     },
 
-    // Método para criar um novo comentário
-    async getRestaurant(id: String) {
-            // Verifica se a postagem e o autor existem
-            const post = await Post.findById(postagemId);
-            const author = await User.findById(autorId);
+    // Método para obter um restaurante por ID
+    async getRestaurant() {
+        const restaurant = await Restaurant.findById("_id");
+        if (restaurant) {
+            return restaurant;
+        } else {
+            throw new Error("Restaurante não encontrado.");
+        }
+    },
 
-            if (!post || !author) {
-                throw new Error("Autor ou Post não encontrado");
-            }
+    // Método para criar um novo restaurante
+    async createRestaurant(name: string, location: string, photos: string, menu: string, availableHours: string): Promise<IRestaurant> {
+        const restaurantExists = await Restaurant.findOne();
 
-            // Cria um novo comentário
-            const newComment = new Comment({
-                postagem: postagemId,
-                autor: autorId,
-                conteudo
+        if (restaurantExists) {
+            throw new Error('Restaurante já existe');
+        }
+
+        const newRestaurant = new Restaurant({ name, location, photos, menu, availableHours });
+
+        return await newRestaurant.save();
+    },
+
+    // Método para atualizar um restaurante
+    async updateRestaurant(id: string, data: Partial<IRestaurant>): Promise<IRestaurant | null> {
+        const { location } = data;
+
+        if (location) {
+            const sameRestaurantLocation = await Restaurant.findOne({
+                location,
+                _id: { $ne: id } // $ne = not equal
             });
-
-            // Salva o comentário no banco de dados
-            const savedComment = await newComment.save();
-
-            if (savedComment) {
-                return savedComment;
-            } else {
-                throw new Error("Erro");
+            
+            if (sameRestaurantLocation) {
+                throw new Error('Restaurante com esse endereço já existe na base de dados.');
             }
+        }
 
+        return await Restaurant.findByIdAndUpdate(id, data, { new: true });
+    },
+
+    // Método para excluir um restaurante
+    async deleteRestaurant(id: string): Promise<void> {
+        await Restaurant.findByIdAndDelete(id);
     }
+
 };

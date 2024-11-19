@@ -7,8 +7,8 @@ export default {
     },
 
     // Método para obter um restaurante por ID
-    async getRestaurant() {
-        const restaurant = await Restaurant.findById("_id");
+    async getRestaurant(id: string) {
+        const restaurant = await Restaurant.findById(id);
         if (restaurant) {
             return restaurant;
         } else {

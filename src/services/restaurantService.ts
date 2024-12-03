@@ -1,44 +1,53 @@
 import mongoose from 'mongoose';
-const Comment = require('../models/commentModel');
-const Post = require('../models/commentModel');
-const User = require('../models/commentModel');
+import Restaurant, { IRestaurant } from '../models/restaurantModel';
 
 export default {
-    // Método para obter um comentário por ID
     async getAllRestaurant() {
-            const comment = await Comment.findById(id).populate('autor postagem'); // Popula os dados do autor e da postagem
-            if (comment) {
-                return comment;
-            } else {
-                throw new Error("Erro");
-            }
+        const allRestaurant = await Restaurant.find();
+        if (allRestaurant) {
+            return allRestaurant;
+        } else {
+            throw new Error("Erro");
+        }
     },
 
-    // Método para criar um novo comentário
     async getRestaurant(id: String) {
-            // Verifica se a postagem e o autor existem
-            const post = await Post.findById(postagemId);
-            const author = await User.findById(autorId);
+        const restaurant = await Restaurant.findById(id);
+        if (restaurant) {
+            return restaurant;
+        } else {
+            throw new Error("Erro");
+        }
 
-            if (!post || !author) {
-                throw new Error("Autor ou Post não encontrado");
-            }
+    },
+    // Criar um novo restaurante
+    async createRestaurant(data: {
+        name: string;
+        location: string;
+        photos?: string[];
+        menu?: string[];
+        availableHours?: string[];
+    }): Promise<IRestaurant> {
+        const newRestaurant = new Restaurant(data);
+        const savedRestaurant = await newRestaurant.save();
+        return savedRestaurant;
+    },
 
-            // Cria um novo comentário
-            const newComment = new Comment({
-                postagem: postagemId,
-                autor: autorId,
-                conteudo
-            });
+    // Atualizar um restaurante
+    async updateRestaurant(id: string, updateData: Partial<IRestaurant>): Promise<IRestaurant | null> {
+        const updatedRestaurant = await Restaurant.findByIdAndUpdate(id, updateData, { new: true });
+        if (!updatedRestaurant) {
+            throw new Error(`Restaurante com ID ${id} não encontrado para atualização`);
+        }
+        return updatedRestaurant;
+    },
 
-            // Salva o comentário no banco de dados
-            const savedComment = await newComment.save();
-
-            if (savedComment) {
-                return savedComment;
-            } else {
-                throw new Error("Erro");
-            }
-
-    }
+    // Excluir um restaurante
+    async deleteRestaurant(id: string): Promise<IRestaurant | null> {
+        const deletedRestaurant = await Restaurant.findByIdAndDelete(id);
+        if (!deletedRestaurant) {
+            throw new Error(`Restaurante com ID ${id} não encontrado para exclusão`);
+        }
+        return deletedRestaurant;
+    },
 };

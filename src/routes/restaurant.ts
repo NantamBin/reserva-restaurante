@@ -4,7 +4,19 @@ import { authMiddleware } from '../middleware/authMiddleware';
 
 const restaurantRoutes = express.Router();
 
-restaurantRoutes.get('/restaurant/', authMiddleware, restaurantController.getAllRestaurant);
-restaurantRoutes.get('/restaurant/:id', authMiddleware, restaurantController.getRestaurant);
+// Obter todos os restaurantes
+restaurantRoutes.get('/restaurants', authMiddleware, restaurantController.getAllRestaurant);
+
+// Obter um restaurante específico pelo ID
+restaurantRoutes.get('/restaurants/:id', authMiddleware, restaurantController.getRestaurant);
+
+// Criar um novo restaurante
+restaurantRoutes.post('/restaurants', authMiddleware, restaurantController.createRestaurant);
+
+// Atualizar um restaurante
+restaurantRoutes.put('/restaurants/:id', authMiddleware, restaurantController.updateRestaurant);
+
+// Excluir um restaurante
+restaurantRoutes.delete('/restaurants/:id', authMiddleware, restaurantController.deleteRestaurant);
 
 export default restaurantRoutes;

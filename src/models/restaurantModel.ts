@@ -1,11 +1,22 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-const restaurantSchema = new mongoose.Schema({
-  name: String,
-  location: String,
-  photos: [String],
-  menu: [String],
-  availableHours: [String]
-});
+export interface IRestaurant extends Document {
+  name: string;
+  location: string;
+  photos: string[];
+  menu: string[];
+  availableHours: string[];
+}
 
-module.exports = mongoose.model('Usuario', restaurantSchema);
+const restaurantSchema: Schema = new Schema(
+  {
+    name: { type: String, required: true },
+    location: { type: String, required: true },
+    photos: { type: [String], default: [] },
+    menu: { type: [String], default: [] },
+    availableHours: { type: [String], default: [] },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model<IRestaurant>('Restaurant', restaurantSchema);

@@ -1,71 +1,90 @@
 import mongoose from 'mongoose';
-const Comment = require('../models/commentModel');
-const Post = require('../models/commentModel');
-const User = require('../models/commentModel');
+import Reservation, { IReservation } from '../models/reservationModel';
 
 export default {
-    // Método para obter um comentário por ID
     async getAllReservations() {
-            const comment = await Comment.findById(id).populate('autor postagem'); // Popula os dados do autor e da postagem
-            if (comment) {
-                return comment;
-            } else {
-                throw new Error("Erro");
-            }
-    },
-
-    // Método para criar um novo comentário
-    async getReservation(userId: String) {
-            // Verifica se a postagem e o autor existem
-            const post = await Post.findById(postagemId);
-            const author = await User.findById(autorId);
-
-            if (!post || !author) {
-                throw new Error("Autor ou Post não encontrado");
-            }
-
-            // Cria um novo comentário
-            const newComment = new Comment({
-                postagem: postagemId,
-                autor: autorId,
-                conteudo
-            });
-
-            // Salva o comentário no banco de dados
-            const savedComment = await newComment.save();
-
-            if (savedComment) {
-                return savedComment;
-            } else {
-                throw new Error("Erro");
-            }
-
-    },
-    // Método para criar um novo comentário
-    async createReservation(userId: String) {
-        // Verifica se a postagem e o autor existem
-        const post = await Post.findById(postagemId);
-        const author = await User.findById(autorId);
-
-        if (!post || !author) {
-            throw new Error("Autor ou Post não encontrado");
+        const rerservations = await Reservation.find();
+        if (rerservations) {
+            return rerservations;
+        } else {
+            throw new Error("Erro ao buscar todas as reservas");
         }
+    },
 
-        // Cria um novo comentário
-        const newComment = new Comment({
-            postagem: postagemId,
-            autor: autorId,
-            conteudo
-        });
-
-        // Salva o comentário no banco de dados
-        const savedComment = await newComment.save();
-
-        if (savedComment) {
-            return savedComment;
+    async getReservation(userId: String) {
+        const reservation = await Reservation.findById(userId).populate('restaurantId userId');;
+        if (reservation) {
+            return reservation;
         } else {
             throw new Error("Erro");
         }
 
-    }
+    },
+    // Criar uma nova reserva
+    async createReservation({
+        restaurantId,
+        userId,
+        numOfPeople,
+        reservationDate,
+    }: {
+        restaurantId: string;
+        userId: string;
+        numOfPeople: number;
+        reservationDate: Date;
+    }): Promise<IReservation> {
+        try {
+            // Verificar se já existe uma reserva para o mesmo usuário na mesma data
+            const existingReservation = await Reservation.findOne({
+                userId,
+                reservationDate: { $eq: reservationDate },
+            });
+
+            if (existingReservation) {
+                throw new Error('Já existe uma reserva para esse usuário nesta data e horário.');
+            }
+
+            const newReservation = new Reservation({
+                restaurantId,
+                userId,
+                numOfPeople,
+                reservationDate,
+            });
+
+            const savedReservation = await newReservation.save();
+            return savedReservation;
+        } catch (error: any) {
+            throw new Error(`Erro ao criar reserva: ${error.message}`);
+        }
+    },
+
+    // Atualizar uma reserva pelo ID
+    async updateReservation(
+        reservationId: string,
+        updateData: Partial<IReservation>
+    ): Promise<IReservation | null> {
+        try {
+            const updatedReservation = await Reservation.findByIdAndUpdate(reservationId, updateData, {
+                new: true,
+            });
+            if (!updatedReservation) {
+                throw new Error('Reserva não encontrada para atualização.');
+            }
+            return updatedReservation;
+        } catch (error: any) {
+            throw new Error(`Erro ao atualizar reserva: ${error.message}`);
+        }
+    },
+
+    // Excluir uma reserva pelo ID
+    async deleteReservation(reservationId: string): Promise<IReservation | null> {
+        try {
+            const deletedReservation = await Reservation.findByIdAndDelete(reservationId);
+            if (!deletedReservation) {
+                throw new Error('Reserva não encontrada para exclusão.');
+            }
+            return deletedReservation;
+        } catch (error: any) {
+            throw new Error(`Erro ao excluir reserva: ${error.message}`);
+        }
+    },
 };

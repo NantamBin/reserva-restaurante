@@ -4,8 +4,19 @@ import { authMiddleware } from '../middleware/authMiddleware';
 
 const reservationRouter = express.Router();
 
-reservationRouter.get('/reservation/', authMiddleware, reservationController.getAllReservations);
-reservationRouter.get('/reservation/user/:userId', authMiddleware, reservationController.getReservation);
-reservationRouter.post('/reservation/:id/confirmado', authMiddleware, reservationController.createReservation);
+// Obter todas as reservas
+reservationRouter.get('/reservations', authMiddleware, reservationController.getAllReservations);
+
+// Obter uma reserva específica pelo ID
+reservationRouter.get('/reservations/:reservationId', authMiddleware, reservationController.getReservation);
+
+// Criar uma nova reserva
+reservationRouter.post('/reservations', authMiddleware, reservationController.createReservation);
+
+// Atualizar uma reserva
+reservationRouter.put('/reservations/:reservationId', authMiddleware, reservationController.updateReservation);
+
+// Excluir uma reserva
+reservationRouter.delete('/reservations/:reservationId', authMiddleware, reservationController.deleteReservation);
 
 export default reservationRouter;

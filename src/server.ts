@@ -8,7 +8,6 @@ import reservationRoutes from './routes/restaurant';
 
 dotenv.config();
 const app = express();
-
 app.use(cors())
 app.use(express.json());
 // Conectando ao MongoDB

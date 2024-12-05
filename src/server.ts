@@ -1,12 +1,15 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import userRoutes from './routes/user';
 import restaurantRoutes from './routes/reservation';
 import reservationRoutes from './routes/restaurant';
 
 dotenv.config();
 const app = express();
+
+app.use(cors())
 app.use(express.json());
 // Conectando ao MongoDB
 mongoose.connect(process.env.MONGO_URI as string).then(() => {
